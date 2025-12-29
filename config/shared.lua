@@ -4,7 +4,7 @@ return {
         coords = vector3(1275.58, -1710.48, 54.77),
         size = vector3(2, 2, 1.0),
         heading = 302.17,
-        debugPoly = true,
+        debugPoly = false,
         distance = 2.0
     },
     
