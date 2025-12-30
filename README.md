@@ -41,7 +41,9 @@ Edit `config/shared.lua` to customize:
 3. Complete the hacking minigame
 4. Crypto stick is removed and crypto is added to their account
 
-## License
+## Support
 
-GPL-3.0
+For support, questions, or bug reports, please join our Discord server:
+
+[Discord Support Server](https://discord.gg/xSCBAYFwmY)
 
