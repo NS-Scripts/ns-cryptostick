@@ -21,10 +21,15 @@ A FiveM resource that allows players to convert crypto sticks into crypto curren
 Edit `config/shared.lua` to customize:
 
 - `lesterHouse.coords` - Location of the laptop (default: Lester's house)
-- `cryptoAmount` - Amount of crypto to give per crypto stick (default: 100)
+- `cryptoAmount` - Amount of crypto to give per crypto stick when using 'qbx' provider (default: 100-1000)
 - `hacking.solutionLength` - Difficulty of hacking minigame (default: 4)
 - `hacking.duration` - Time limit for hacking in milliseconds (default: 30000)
 - `useTarget` - Use ox_target for interactions (default: true)
+- `cryptoProvider` - Crypto provider to use: 'lb' for lb-phone or 'qbx' for qbx_core framework (default: 'lb')
+- `lbPhone.coin` - Crypto coin type to add when using 'lb' provider (default: 'bitcoin')
+- `lbPhone.amountMin` - Minimum crypto amount for 'lb' provider (default: 0.005)
+- `lbPhone.amountMax` - Maximum crypto amount for 'lb' provider (default: 0.01)
+- `lbPhone.amountChance` - Special chance amount for 'lb' provider (default: 0.1)
 
 ## Dependencies
 
@@ -33,6 +38,7 @@ Edit `config/shared.lua` to customize:
 - ox_inventory
 - mhacking (standalone resource)
 - ox_target (optional, if useTarget is true)
+- lb-phone (required if cryptoProvider is set to 'lb')
 
 ## Usage
 

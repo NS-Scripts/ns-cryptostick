@@ -8,6 +8,42 @@ local function isPlayerAtLesterHouse(src)
     return distance <= 5.0
 end
 
+---@param src number
+---@return boolean success
+---@return number amount
+local function addCryptoToPlayer(src)
+    if config.cryptoProvider == 'lb' then
+        -- Use lb-phone
+        local lbPhoneResource = GetResourceState('lb-phone')
+        if lbPhoneResource ~= 'started' then
+            return false, 0
+        end
+        
+        local amount
+        if math.random(1, 100) < 2 then
+            amount = config.lbPhone.amountChance
+        else
+            amount = math.random() * (config.lbPhone.amountMax - config.lbPhone.amountMin) + config.lbPhone.amountMin
+        end
+        
+        local success = exports['lb-phone']:AddCrypto(src, config.lbPhone.coin, amount)
+        if success then
+            return true, amount
+        end
+        return false, 0
+    else
+        -- Use qbx_core framework
+        local Player = exports.qbx_core:GetPlayer(src)
+        if not Player then
+            return false, 0
+        end
+        
+        local amount = math.random(config.cryptoAmount.min, config.cryptoAmount.max)
+        Player.Functions.AddMoney('crypto', amount, 'crypto_stick_conversion')
+        return true, amount
+    end
+end
+
 -- Check if player has crypto stick and is at Lester's house
 RegisterNetEvent('ns-cryptostick:server:checkItem', function()
     local src = source
@@ -53,24 +89,33 @@ RegisterNetEvent('ns-cryptostick:server:convertCrypto', function()
     end
     
     -- Add crypto to player
-    local cryptoAmount = math.random(config.cryptoAmount.min, config.cryptoAmount.max)
-    Player.Functions.AddMoney('crypto', cryptoAmount, 'crypto_stick_conversion')
+    local success, cryptoAmount = addCryptoToPlayer(src)
+    
+    if not success then
+        exports.qbx_core:Notify(src, locale('error.crypto_add_failed'), 'error')
+        -- Give the item back if crypto add failed
+        Player.Functions.AddItem(config.requiredItem, 1)
+        return
+    end
+    
     exports.qbx_core:Notify(src, locale('success.converted', cryptoAmount), 'success')
     TriggerClientEvent('inventory:client:ItemBox', src, exports.ox_inventory:Items()[config.requiredItem], 'remove')
 end)
 
--- Command to check crypto balance
-lib.addCommand('crypto', {
-    help = 'Check your crypto balance',
-}, function(source)
-    local Player = exports.qbx_core:GetPlayer(source)
-    
-    if not Player then
-        exports.qbx_core:Notify(source, locale('error.player_not_found'), 'error')
-        return
-    end
-    
-    local cryptoBalance = Player.Functions.GetMoney('crypto') or 0
-    exports.qbx_core:Notify(source, string.format('Your crypto balance: $%s', cryptoBalance), 'primary')
-end)
+-- Command to check crypto balance (only available when using qbx provider)
+if config.cryptoProvider == 'qbx' then
+    lib.addCommand('crypto', {
+        help = 'Check your crypto balance',
+    }, function(source)
+        local Player = exports.qbx_core:GetPlayer(source)
+        
+        if not Player then
+            exports.qbx_core:Notify(source, locale('error.player_not_found'), 'error')
+            return
+        end
+        
+        local cryptoBalance = Player.Functions.GetMoney('crypto') or 0
+        exports.qbx_core:Notify(source, string.format('Your crypto balance: $%s', cryptoBalance), 'primary')
+    end)
+end
 
